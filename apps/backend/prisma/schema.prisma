@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+  name     String
+}
+
+model Product {
+  id          String @id @default(uuid())
+  externalId  Int    @unique // ID que vem da Fake Store API
+  title       String
+  price       Float
+  description String
+  category    String
+  image       String
+}
