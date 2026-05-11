@@ -3,14 +3,22 @@ import { HttpService } from '@nestjs/axios';
 import { PrismaService } from '../prisma/prisma.service';
 import { firstValueFrom } from 'rxjs';
 
-// Definimos a interface para evitar o erro de 'any'
+// 1. Interface do produto individual da DummyJSON
 interface ExternalProduct {
   id: number;
   title: string;
   price: number;
   description: string;
   category: string;
-  image: string;
+  thumbnail: string;
+}
+
+// 2. Interface da resposta da API (que contém o array e metadados)
+interface DummyJsonResponse {
+  products: ExternalProduct[];
+  total: number;
+  skip: number;
+  limit: number;
 }
 
 @Injectable()
@@ -21,37 +29,45 @@ export class ProductsService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const count = await this.prisma.product.count();
-    if (count === 0) {
-      await this.syncProducts();
+    try {
+      const count = await this.prisma.product.count();
+      if (count === 0) {
+        await this.syncProducts();
+      }
+    } catch (error) {
+      console.error('❌ Erro ao verificar contagem de produtos:', error);
     }
   }
 
   async syncProducts() {
-    // Tipamos a resposta da Promise como ExternalProduct[]
+    // Tipamos a resposta com a interface que contém a chave 'products'
     const response = await firstValueFrom(
-      this.httpService.get<ExternalProduct[]>(
-        'https://fakestoreapi.com/products',
+      this.httpService.get<DummyJsonResponse>(
+        'https://dummyjson.com/products?limit=100',
       ),
     );
 
-    const { data } = response;
+    // Agora o TS sabe que data tem a propriedade products
+    const { products } = response.data;
 
-    // Usando createMany para performance e segurança de tipos
-    const productsToSave = data.map((item) => ({
+    const productsToSave = products.map((item) => ({
       externalId: item.id,
       title: item.title,
       price: item.price,
       description: item.description,
       category: item.category,
-      image: item.image,
+      image: item.thumbnail,
     }));
 
+    // Inserção em massa
     await this.prisma.product.createMany({
       data: productsToSave,
+      skipDuplicates: true, // Boa prática para evitar erros de chave única
     });
 
-    console.log('📦 Produtos sincronizados com sucesso!');
+    console.log(
+      `🚀 ${productsToSave.length} produtos sincronizados com sucesso!`,
+    );
   }
 
   findAll() {
