@@ -7,8 +7,6 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   constructor() {
-    // Passamos um objeto vazio tipado para satisfazer o construtor do Prisma
-    // e evitar o erro de "Unsafe call" no super()
     super({
       log: ['error', 'warn'],
     });
@@ -16,8 +14,6 @@ export class PrismaService
 
   async onModuleInit(): Promise<void> {
     try {
-      // O cast 'as unknown as Promise<void>' é a saída para quando o ESLint
-      // não reconhece o retorno do binário do Prisma no Monorepo
       await this.$connect();
       console.log('✅ Conexão com o banco estabelecida com sucesso!');
     } catch (error) {
@@ -26,9 +22,6 @@ export class PrismaService
       if (!process.env.DATABASE_URL) {
         console.error('⚠️ DATABASE_URL não encontrada no ambiente!');
       }
-
-      // Em produção, você pode querer derrubar a app se o banco não subir
-      // process.exit(1);
     }
   }
 

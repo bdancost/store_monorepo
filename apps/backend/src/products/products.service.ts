@@ -78,7 +78,6 @@ export class ProductsService implements OnModuleInit {
     });
   }
 
-  // TIPADO: Retorno explícito para limpar o erro do ESLint
   async findAll(): Promise<Product[]> {
     return this.prisma.product.findMany();
   }
