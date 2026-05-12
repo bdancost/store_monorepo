@@ -16,7 +16,7 @@ model User {
 
 model Product {
   id          String @id @default(uuid())
-  externalId  Int    @unique // ID que vem da Fake Store API
+  externalId  Int?   @unique // ID que vem da Fake Store API
   title       String
   price       Float
   description String

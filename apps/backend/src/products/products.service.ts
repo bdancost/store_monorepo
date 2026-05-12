@@ -2,8 +2,9 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { PrismaService } from '../prisma/prisma.service';
 import { firstValueFrom } from 'rxjs';
+import { Product } from '@prisma/client'; // Importe o tipo gerado pelo Prisma
+import { CreateProductDto } from './dto/create-product.dto';
 
-// 1. Interface do produto individual da DummyJSON
 interface ExternalProduct {
   id: number;
   title: string;
@@ -13,7 +14,6 @@ interface ExternalProduct {
   thumbnail: string;
 }
 
-// 2. Interface da resposta da API (que contém o array e metadados)
 interface DummyJsonResponse {
   products: ExternalProduct[];
   total: number;
@@ -28,7 +28,7 @@ export class ProductsService implements OnModuleInit {
     private readonly httpService: HttpService,
   ) {}
 
-  async onModuleInit() {
+  async onModuleInit(): Promise<void> {
     try {
       const count = await this.prisma.product.count();
       if (count === 0) {
@@ -39,15 +39,13 @@ export class ProductsService implements OnModuleInit {
     }
   }
 
-  async syncProducts() {
-    // Tipamos a resposta com a interface que contém a chave 'products'
+  async syncProducts(): Promise<void> {
     const response = await firstValueFrom(
       this.httpService.get<DummyJsonResponse>(
         'https://dummyjson.com/products?limit=100',
       ),
     );
 
-    // Agora o TS sabe que data tem a propriedade products
     const { products } = response.data;
 
     const productsToSave = products.map((item) => ({
@@ -59,18 +57,29 @@ export class ProductsService implements OnModuleInit {
       image: item.thumbnail,
     }));
 
-    // Inserção em massa
     await this.prisma.product.createMany({
       data: productsToSave,
-      skipDuplicates: true, // Boa prática para evitar erros de chave única
+      skipDuplicates: true,
     });
 
-    console.log(
-      `🚀 ${productsToSave.length} produtos sincronizados com sucesso!`,
-    );
+    console.log(`🚀 ${productsToSave.length} produtos sincronizados!`);
   }
 
-  findAll() {
+  // ADICIONADO: Método create que o Controller precisa
+  async create(data: CreateProductDto): Promise<Product> {
+    return this.prisma.product.create({
+      data: {
+        title: data.title,
+        price: data.price,
+        description: data.description,
+        category: data.category,
+        image: data.image,
+      },
+    });
+  }
+
+  // TIPADO: Retorno explícito para limpar o erro do ESLint
+  async findAll(): Promise<Product[]> {
     return this.prisma.product.findMany();
   }
 }
