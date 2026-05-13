@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { firstValueFrom } from 'rxjs';
 import { Product } from '@prisma/client'; // Importe o tipo gerado pelo Prisma
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 interface ExternalProduct {
   id: number;
@@ -80,5 +81,18 @@ export class ProductsService implements OnModuleInit {
 
   async findAll(): Promise<Product[]> {
     return this.prisma.product.findMany();
+  }
+
+  async update(id: string, data: UpdateProductDto) {
+    return this.prisma.product.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async remove(id: string) {
+    return this.prisma.product.delete({
+      where: { id },
+    });
   }
 }
