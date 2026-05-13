@@ -83,14 +83,14 @@ export class ProductsService implements OnModuleInit {
     return this.prisma.product.findMany();
   }
 
-  async update(id: string, data: UpdateProductDto) {
+  async update(id: string, data: UpdateProductDto): Promise<Product> {
     return this.prisma.product.update({
       where: { id },
       data,
     });
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<Product> {
     return this.prisma.product.delete({
       where: { id },
     });
