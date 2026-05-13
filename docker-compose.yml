@@ -8,4 +8,4 @@ services:
       POSTGRES_PASSWORD: Dev2024full
       POSTGRES_DB: store_db
     ports:
-      - "5432:5432"
+      - "5434:5432"
