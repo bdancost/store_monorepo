@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { useProtectedRoute } from "../hooks/useProtectedRoute";
 import { useUser } from "../hooks/useUser";
+import { useProducts } from "../hooks/useProducts";
+import ProductGrid from "../components/shop/ProductGrid";
 
 function HeroBanner({ userName }: { userName: string }) {
   return (
@@ -116,6 +118,7 @@ function PageSkeleton() {
 export default function ShopPage() {
   const { checking } = useProtectedRoute();
   const user = useUser();
+  const { products, loading, error } = useProducts();
 
   if (checking) return <PageSkeleton />;
 
@@ -124,12 +127,21 @@ export default function ShopPage() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
         <HeroBanner userName={user?.name?.split(" ")[0] ?? "Cliente"} />
 
-        {/* Próximas tasks virão aqui */}
-        <div className="flex items-center justify-center h-48 rounded-2xl border border-dashed border-amber-400/20">
-          <p className="text-amber-400/40 text-sm tracking-widest">
-            PRODUTOS — SHOP-02
-          </p>
+        {/* Cabeçalho da seção */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-lg font-medium text-white">
+              Todos os produtos
+            </h2>
+            <p className="text-xs text-white/30 mt-0.5">
+              {loading
+                ? "Carregando..."
+                : `${products.length} produtos encontrados`}
+            </p>
+          </div>
         </div>
+
+        <ProductGrid products={products} loading={loading} error={error} />
       </div>
     </div>
   );
