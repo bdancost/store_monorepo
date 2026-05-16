@@ -48,14 +48,9 @@ describe('ProductsService', () => {
   });
 
   it('deve retornar uma lista de produtos', async () => {
-    const result = await service.findAll();
-
-    // Verificamos se o resultado é igual ao nosso mock
-    expect(result).toEqual(mockProducts);
-
-    // Use o jest.spyOn para observar o método sem "desgrudá-lo" do objeto
-    // Isso silencia o ESLint e funciona perfeitamente no Jest
     const findManySpy = jest.spyOn(prisma.product, 'findMany');
+    const result = await service.findAll();
+    expect(result).toEqual(mockProducts);
     expect(findManySpy).toHaveBeenCalledTimes(1);
   });
 });

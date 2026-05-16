@@ -1,21 +1,20 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 
 interface UserPayload {
   sub: string;
   email: string;
-  // adicione outros campos que você inseriu no token ao fazer o login
 }
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private configService: ConfigService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
@@ -26,12 +25,9 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      // Valida o token com a chave secreta
       const payload = await this.jwtService.verifyAsync<UserPayload>(token, {
-        secret: 'SECRET_KEY_SUPER_SEGURA', // Deve ser a mesma do AuthModule
+        secret: this.configService.get<string>('JWT_SECRET'),
       });
-
-      // Anexa os dados do usuário à requisição para uso posterior
       request['user'] = payload;
     } catch {
       throw new UnauthorizedException('Token inválido ou expirado');
