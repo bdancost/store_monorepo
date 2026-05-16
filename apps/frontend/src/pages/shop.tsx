@@ -1,13 +1,16 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useProtectedRoute } from "../hooks/useProtectedRoute";
 import { useUser } from "../hooks/useUser";
 import { useProducts } from "../hooks/useProducts";
+import { useProductFilters } from "../hooks/useProductFilters";
 import ProductGrid from "../components/shop/ProductGrid";
+import SearchBar from "../components/shop/SearchBar";
+import CategoryFilters from "../components/shop/CategoryFilters";
+import { useMemo } from "react";
 
 function HeroBanner({ userName }: { userName: string }) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-amber-400/15 mb-8">
-      {/* Fundo com gradiente */}
       <div
         className="absolute inset-0"
         style={{
@@ -15,21 +18,14 @@ function HeroBanner({ userName }: { userName: string }) {
             "linear-gradient(135deg, #0d0d1a 0%, #1a1400 50%, #0d0d1a 100%)",
         }}
       />
-
-      {/* Círculos decorativos */}
       <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full border border-amber-400/10" />
       <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full border border-amber-400/10" />
-      <div className="absolute right-32 -bottom-12 w-48 h-48 rounded-full border border-amber-400/5" />
 
-      {/* Partículas decorativas */}
       {[...Array(6)].map((_, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 rounded-full bg-amber-400/40"
-          style={{
-            left: `${15 + i * 14}%`,
-            top: `${20 + (i % 3) * 25}%`,
-          }}
+          style={{ left: `${15 + i * 14}%`, top: `${20 + (i % 3) * 25}%` }}
           animate={{ y: [0, -12, 0], opacity: [0.4, 1, 0.4] }}
           transition={{
             duration: 2.5 + i * 0.4,
@@ -39,7 +35,6 @@ function HeroBanner({ userName }: { userName: string }) {
         />
       ))}
 
-      {/* Conteúdo */}
       <div className="relative px-8 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
           <motion.p
@@ -50,7 +45,6 @@ function HeroBanner({ userName }: { userName: string }) {
           >
             BEM-VINDO DE VOLTA
           </motion.p>
-
           <motion.h1
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -59,7 +53,6 @@ function HeroBanner({ userName }: { userName: string }) {
           >
             Olá, <span className="text-amber-400">{userName}</span> 👋
           </motion.h1>
-
           <motion.p
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -70,7 +63,6 @@ function HeroBanner({ userName }: { userName: string }) {
           </motion.p>
         </div>
 
-        {/* Stats rápidos */}
         <motion.div
           initial={{ opacity: 0, x: 16 }}
           animate={{ opacity: 1, x: 0 }}
@@ -119,6 +111,23 @@ export default function ShopPage() {
   const { checking } = useProtectedRoute();
   const user = useUser();
   const { products, loading, error } = useProducts();
+  const {
+    search,
+    setSearch,
+    activeCategory,
+    setActiveCategory,
+    categories,
+    filtered,
+    total,
+  } = useProductFilters(products);
+
+  // Contagem por categoria para exibir nas pills
+  const categoryCounts = useMemo(() => {
+    return products.reduce<Record<string, number>>((acc, p) => {
+      acc[p.category] = (acc[p.category] ?? 0) + 1;
+      return acc;
+    }, {});
+  }, [products]);
 
   if (checking) return <PageSkeleton />;
 
@@ -127,21 +136,42 @@ export default function ShopPage() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
         <HeroBanner userName={user?.name?.split(" ")[0] ?? "Cliente"} />
 
-        {/* Cabeçalho da seção */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-lg font-medium text-white">
-              Todos os produtos
-            </h2>
-            <p className="text-xs text-white/30 mt-0.5">
-              {loading
-                ? "Carregando..."
-                : `${products.length} produtos encontrados`}
-            </p>
+        {/* Barra de filtros */}
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <SearchBar
+              value={search}
+              onChange={setSearch}
+              total={total}
+              loading={loading}
+            />
+
+            {/* Contador de resultados */}
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={total}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 4 }}
+                className="text-xs text-white/30 shrink-0"
+              >
+                {loading
+                  ? "Carregando..."
+                  : `${total} produto${total !== 1 ? "s" : ""}`}
+              </motion.p>
+            </AnimatePresence>
           </div>
+
+          <CategoryFilters
+            categories={categories}
+            active={activeCategory}
+            onChange={setActiveCategory}
+            counts={categoryCounts}
+          />
         </div>
 
-        <ProductGrid products={products} loading={loading} error={error} />
+        {/* Grid */}
+        <ProductGrid products={filtered} loading={loading} error={error} />
       </div>
     </div>
   );
