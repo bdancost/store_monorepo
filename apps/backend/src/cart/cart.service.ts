@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, CartItem } from '@prisma/client';
 
@@ -26,9 +30,7 @@ export class CartService {
       include: includeClause,
     });
 
-    if (existingCart) {
-      return existingCart;
-    }
+    if (existingCart) return existingCart;
 
     return this.prisma.cart.create({
       data: { userId },
@@ -44,10 +46,7 @@ export class CartService {
     const cart: CartWithItems = await this.getOrCreateCart(userId);
 
     const existingItem: CartItem | null = await this.prisma.cartItem.findFirst({
-      where: {
-        cartId: cart.id,
-        productId,
-      },
+      where: { cartId: cart.id, productId },
     });
 
     if (existingItem) {
@@ -58,27 +57,47 @@ export class CartService {
     }
 
     return this.prisma.cartItem.create({
-      data: {
-        cartId: cart.id,
-        productId,
-        quantity,
-      },
+      data: { cartId: cart.id, productId, quantity },
     });
   }
 
   async updateItemQuantity(
+    userId: string,
     cartItemId: string,
     quantity: number,
   ): Promise<CartItem> {
+    await this.validateOwnership(userId, cartItemId);
+
     return this.prisma.cartItem.update({
       where: { id: cartItemId },
       data: { quantity },
     });
   }
 
-  async removeItem(cartItemId: string): Promise<CartItem> {
+  async removeItem(userId: string, cartItemId: string): Promise<CartItem> {
+    await this.validateOwnership(userId, cartItemId);
+
     return this.prisma.cartItem.delete({
       where: { id: cartItemId },
     });
+  }
+
+  // Garante que o item pertence ao carrinho do usuário logado
+  private async validateOwnership(
+    userId: string,
+    cartItemId: string,
+  ): Promise<void> {
+    const item = await this.prisma.cartItem.findUnique({
+      where: { id: cartItemId },
+      include: { cart: true },
+    });
+
+    if (!item) {
+      throw new NotFoundException('Item não encontrado');
+    }
+
+    if (item.cart.userId !== userId) {
+      throw new ForbiddenException('Acesso negado');
+    }
   }
 }

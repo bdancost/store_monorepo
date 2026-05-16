@@ -3,6 +3,8 @@ import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import 'dotenv/config';
 
 async function bootstrap() {
@@ -10,18 +12,31 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
-  app.setGlobalPrefix('api');
+  // Segurança
+  app.use(helmet());
+  app.setGlobalPrefix('api/v1');
   app.enableCors();
 
-  // Troque o ValidationPipe global por este:
+  // Pipes e Filtros globais
   app.useGlobalPipes(new ZodValidationPipe());
-
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  const port = process.env.PORT || 3000;
+  // Swagger
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('My Store API')
+    .setDescription('Documentação da API da loja')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, document);
+
+  const port = process.env.PORT ?? 3000;
   await app.listen(port);
 
-  // Usamos o logger em vez do console.log
-  logger.log(`🚀 Application is running on: http://localhost:${port}/api`);
+  logger.log(`🚀 Application is running on: http://localhost:${port}/api/v1`);
+  logger.log(`📚 Swagger available on: http://localhost:${port}/api/docs`);
 }
-bootstrap();
+
+void bootstrap();

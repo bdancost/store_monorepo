@@ -22,13 +22,11 @@ import { UpdateCartSchema } from './dto/update-cart.dto';
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  // Rota para ver o carrinho: GET /api/cart
   @Get()
   getCart(@Req() req: any) {
     return this.cartService.getOrCreateCart(req.user.sub);
   }
 
-  // Rota para adicionar item: POST /api/cart/add
   @Post('add')
   addToCart(@Req() req: any, @Body() body: unknown) {
     const parsed = AddToCartSchema.safeParse(body);
@@ -41,21 +39,23 @@ export class CartController {
     return this.cartService.addToCart(req.user.sub, productId, quantity);
   }
 
-  // PATCH /api/cart/item/:id
   @Patch('item/:id')
-  updateItem(@Param('id') id: string, @Body() body: unknown) {
+  updateItem(@Req() req: any, @Param('id') id: string, @Body() body: unknown) {
     const parsed = UpdateCartSchema.safeParse(body);
 
     if (!parsed.success) {
       throw new BadRequestException(parsed.error.flatten().fieldErrors);
     }
 
-    return this.cartService.updateItemQuantity(id, parsed.data.quantity);
+    return this.cartService.updateItemQuantity(
+      req.user.sub,
+      id,
+      parsed.data.quantity,
+    );
   }
 
-  // Rota para deletar um item: DELETE /api/cart/item/:id
   @Delete('item/:id')
-  removeItem(@Param('id') id: string) {
-    return this.cartService.removeItem(id);
+  removeItem(@Req() req: any, @Param('id') id: string) {
+    return this.cartService.removeItem(req.user.sub, id);
   }
 }
