@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import Clock from "./Clock";
 import CartButton from "./CartButton";
+import UserMenu from "./UserMenu";
 
 const navLinks = [
   { label: "Início", href: "/shop" },
@@ -88,6 +89,8 @@ export default function Header() {
           <div className="text-xs text-white/20 hidden lg:block">
             <div className="flex items-center gap-4 ml-auto">
               <CartButton />
+              <div className="w-px h-5 bg-white/10" /> {/* divisor */}
+              <UserMenu />
               <Clock />
             </div>
           </div>
