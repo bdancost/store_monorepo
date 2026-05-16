@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Clock from "./Clock";
 
 const navLinks = [
   { label: "Início", href: "/shop" },
@@ -84,7 +85,9 @@ export default function Header() {
         {/* Lado direito — será preenchido nas próximas tasks */}
         <div className="flex items-center gap-3 ml-auto">
           <div className="text-xs text-white/20 hidden lg:block">
-            — próximas tasks aqui —
+            <div className="flex items-center gap-4 ml-auto">
+              <Clock />
+            </div>
           </div>
         </div>
       </div>
