@@ -6,6 +6,7 @@ interface ProductGridProps {
   products: Product[];
   loading: boolean;
   error: string | null;
+  onCartOpen: () => void;
 }
 
 function ProductSkeleton() {
@@ -28,6 +29,7 @@ export default function ProductGrid({
   products,
   loading,
   error,
+  onCartOpen,
 }: ProductGridProps) {
   if (error) {
     return (
@@ -66,7 +68,12 @@ export default function ProductGrid({
       {loading
         ? [...Array(8)].map((_, i) => <ProductSkeleton key={i} />)
         : products.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              index={i}
+              onCartOpen={onCartOpen}
+            />
           ))}
     </div>
   );

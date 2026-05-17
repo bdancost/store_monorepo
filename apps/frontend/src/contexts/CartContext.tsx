@@ -1,7 +1,22 @@
 import { createContext, useContext, ReactNode } from "react";
 import { useCart } from "../hooks/useCart";
 
+export type Cart = {
+  id: string;
+  items: {
+    id: string;
+    quantity: number;
+    product: {
+      id: string;
+      title: string;
+      price: number;
+      image: string;
+    };
+  }[];
+};
+
 interface CartContextType {
+  cart: Cart | null;
   itemCount: number;
   total: number;
   loading: boolean;
@@ -9,6 +24,7 @@ interface CartContextType {
 }
 
 const CartContext = createContext<CartContextType>({
+  cart: null,
   itemCount: 0,
   total: 0,
   loading: false,
@@ -16,10 +32,10 @@ const CartContext = createContext<CartContextType>({
 });
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const { itemCount, total, loading, refetch } = useCart();
+  const { cart, itemCount, total, loading, refetch } = useCart();
 
   return (
-    <CartContext.Provider value={{ itemCount, total, loading, refetch }}>
+    <CartContext.Provider value={{ cart, itemCount, total, loading, refetch }}>
       {children}
     </CartContext.Provider>
   );

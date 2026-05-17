@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useProtectedRoute } from "../hooks/useProtectedRoute";
 import { useUser } from "../hooks/useUser";
@@ -8,6 +9,7 @@ import SearchBar from "../components/shop/SearchBar";
 import CategoryFilters from "../components/shop/CategoryFilters";
 import SortSelect from "../components/shop/SortSelect";
 import Pagination from "../components/shop/Pagination";
+import CartDrawer from "../components/shop/CartDrawer";
 import { useMemo } from "react";
 
 function HeroBanner({ userName }: { userName: string }) {
@@ -127,6 +129,7 @@ export default function ShopPage() {
     setPage,
     totalPages,
   } = useProductFilters(products);
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
 
   // Contagem por categoria para exibir nas pills
   const categoryCounts = useMemo(() => {
@@ -182,7 +185,17 @@ export default function ShopPage() {
         </div>
 
         {/* Grid */}
-        <ProductGrid products={paginated} loading={loading} error={error} />
+        <ProductGrid
+          products={paginated}
+          loading={loading}
+          error={error}
+          onCartOpen={() => setCartDrawerOpen(true)}
+        />
+
+        <CartDrawer
+          open={cartDrawerOpen}
+          onClose={() => setCartDrawerOpen(false)}
+        />
         <Pagination
           page={page}
           totalPages={totalPages}
