@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -26,6 +27,7 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
   const { itemCount } = useCartContext();
   const user = useUser();
   const { logout } = useAuth();
+  const isMounted = useRef(false); // <- flag para ignorar primeira execução
 
   // Fecha com tecla Escape
   useEffect(() => {
@@ -44,10 +46,14 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
     };
   }, [open]);
 
-  // Fecha ao trocar de rota
+  // Fecha ao trocar de rota — ignora montagem inicial
   useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true;
+      return;
+    }
     onClose();
-  }, [router.pathname, onClose]);
+  }, [router.pathname]); // <- removido onClose das deps intencionalmente
 
   const initials =
     user?.name
@@ -154,7 +160,6 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
                           : "text-white/60 hover:text-white hover:bg-white/[.04]"
                       }`}
                     >
-                      {/* Indicador de rota ativa */}
                       {isActive && (
                         <motion.div
                           layoutId="mobile-nav-indicator"
@@ -169,7 +174,6 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
                       <span className="text-base">{link.icon}</span>
                       <span className="flex-1">{link.label}</span>
 
-                      {/* Badge no carrinho */}
                       {isCart && itemCount > 0 && (
                         <span
                           className="text-[10px] font-medium text-black px-1.5 py-0.5 rounded-full"
