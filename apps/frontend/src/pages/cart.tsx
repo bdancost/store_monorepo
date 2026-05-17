@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import { useProtectedRoute } from "../hooks/useProtectedRoute";
 import { useCartContext } from "../contexts/CartContext";
 import { useToast } from "../contexts/ToastContext";
+import QuantityControl from "../components/cart/QuantityControl";
+
 import api from "../services/api";
 
 // ─────────────────────────────────────────────
@@ -145,7 +147,7 @@ function CartItemRow({ item, onRemove }: CartItemRowProps) {
       </div>
 
       {/* Subtotal + remover */}
-      <div className="flex flex-col items-end gap-2 shrink-0">
+      <div className="flex flex-col items-end gap-3 shrink-0">
         <p className="text-base font-medium text-amber-400">
           {subtotal.toLocaleString("pt-BR", {
             style: "currency",
@@ -153,7 +155,10 @@ function CartItemRow({ item, onRemove }: CartItemRowProps) {
           })}
         </p>
 
-        {/* Botão de remover — aparece no hover */}
+        {/* Controle de quantidade com Optimistic UI */}
+        <QuantityControl itemId={item.id} initialQuantity={item.quantity} />
+
+        {/* Botão remover */}
         <motion.button
           whileTap={{ scale: 0.85 }}
           onClick={() => void onRemove(item.id)}
