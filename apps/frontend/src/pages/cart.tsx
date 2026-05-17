@@ -1,10 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/router";
 import { useProtectedRoute } from "../hooks/useProtectedRoute";
 import { useCartContext } from "../contexts/CartContext";
 import { useToast } from "../contexts/ToastContext";
 import QuantityControl from "../components/cart/QuantityControl";
+import { useOrderSummary } from "../hooks/useOrderSummary";
+import OrderSummary from "../components/cart/OrderSummary";
 
 import api from "../services/api";
 
@@ -188,8 +191,13 @@ export default function CartPage() {
   // desnecessário e inconsistência de estado.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { cart, total, loading, refetch } = useCartContext();
+  const [checkingOut, setCheckingOut] = useState(false);
   const { showToast } = useToast();
   const router = useRouter();
+
+  // Derived state — calculado a partir dos itens do contexto
+  // Sem useState, sem useEffect, sem risco de dessincronização
+  const summary = useOrderSummary(cart?.items ?? []);
 
   // Enquanto verifica autenticação, mostra skeleton
   if (checking || loading) {
@@ -201,6 +209,13 @@ export default function CartPage() {
         </div>
       </div>
     );
+  }
+
+  // Função de checkout — será implementada no CART-04
+  async function handleCheckout() {
+    setCheckingOut(true);
+    // lógica virá na próxima task
+    setCheckingOut(false);
   }
 
   async function handleRemove(cartItemId: string) {
@@ -265,7 +280,19 @@ export default function CartPage() {
             <div className="lg:w-80 shrink-0">
               <div className="rounded-2xl border border-dashed border-amber-400/20 flex items-center justify-center h-48">
                 <p className="text-amber-400/30 text-xs tracking-widest">
-                  RESUMO — CART-03
+                  <div className="lg:w-80 shrink-0">
+                    <OrderSummary
+                      subtotal={summary.subtotal}
+                      shipping={summary.shipping}
+                      discount={summary.discount}
+                      total={summary.total}
+                      hasFreeShipping={summary.hasFreeShipping}
+                      freeShippingProgress={summary.freeShippingProgress}
+                      amountToFreeShipping={summary.amountToFreeShipping}
+                      onCheckout={() => void handleCheckout()}
+                      checkingOut={checkingOut}
+                    />
+                  </div>
                 </p>
               </div>
             </div>
