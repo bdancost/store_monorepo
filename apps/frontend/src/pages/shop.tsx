@@ -6,6 +6,8 @@ import { useProductFilters } from "../hooks/useProductFilters";
 import ProductGrid from "../components/shop/ProductGrid";
 import SearchBar from "../components/shop/SearchBar";
 import CategoryFilters from "../components/shop/CategoryFilters";
+import SortSelect from "../components/shop/SortSelect";
+import Pagination from "../components/shop/Pagination";
 import { useMemo } from "react";
 
 function HeroBanner({ userName }: { userName: string }) {
@@ -116,9 +118,14 @@ export default function ShopPage() {
     setSearch,
     activeCategory,
     setActiveCategory,
+    sort,
+    setSort,
     categories,
-    filtered,
+    paginated,
     total,
+    page,
+    setPage,
+    totalPages,
   } = useProductFilters(products);
 
   // Contagem por categoria para exibir nas pills
@@ -147,19 +154,23 @@ export default function ShopPage() {
             />
 
             {/* Contador de resultados */}
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={total}
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 4 }}
-                className="text-xs text-white/30 shrink-0"
-              >
-                {loading
-                  ? "Carregando..."
-                  : `${total} produto${total !== 1 ? "s" : ""}`}
-              </motion.p>
-            </AnimatePresence>
+            <div className="flex items-center gap-3 sm:ml-auto">
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={total}
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 4 }}
+                  className="text-xs text-white/30 shrink-0"
+                >
+                  {loading
+                    ? "Carregando..."
+                    : `${total} produto${total !== 1 ? "s" : ""}`}
+                </motion.p>
+              </AnimatePresence>
+
+              <SortSelect value={sort} onChange={setSort} />
+            </div>
           </div>
 
           <CategoryFilters
@@ -171,7 +182,12 @@ export default function ShopPage() {
         </div>
 
         {/* Grid */}
-        <ProductGrid products={filtered} loading={loading} error={error} />
+        <ProductGrid products={paginated} loading={loading} error={error} />
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
       </div>
     </div>
   );
