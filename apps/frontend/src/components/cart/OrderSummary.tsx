@@ -9,8 +9,26 @@ interface OrderSummaryProps {
   freeShippingProgress: number;
   amountToFreeShipping: number;
   onCheckout: () => void;
-  checkingOut: boolean;
+  checkoutStatus: "idle" | "loading" | "success" | "error";
 }
+
+// Mapa de label por status — lógica fora do JSX
+// Por que fora do JSX? JSX com ternários encadeados
+// é difícil de ler. Um objeto de lookup é mais limpo
+const buttonLabels: Record<string, string> = {
+  idle: "Finalizar pedido →",
+  loading: "Processando pedido...",
+  success: "✓ Pedido criado!",
+  error: "Tente novamente",
+};
+
+// Mapa de cor por status
+const buttonColors: Record<string, string> = {
+  idle: "linear-gradient(135deg, #d4af37, #b8960c)",
+  loading: "linear-gradient(135deg, #b8960c, #8a6f09)",
+  success: "linear-gradient(135deg, #22c55e, #16a34a)",
+  error: "linear-gradient(135deg, #ef4444, #dc2626)",
+};
 
 // Componente auxiliar para linha de valor
 // Por que extrair? Porque o padrão label + valor
@@ -57,7 +75,7 @@ export default function OrderSummary({
   freeShippingProgress,
   amountToFreeShipping,
   onCheckout,
-  checkingOut,
+  checkoutStatus,
 }: OrderSummaryProps) {
   // Formatador de moeda reutilizado localmente
   // Por que não criar um utils/formatCurrency?
@@ -159,23 +177,31 @@ export default function OrderSummary({
       <motion.button
         whileTap={{ scale: 0.97 }}
         onClick={onCheckout}
-        disabled={checkingOut}
-        className="w-full py-3.5 rounded-xl text-sm font-medium text-black disabled:opacity-60 transition-opacity relative overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #d4af37, #b8960c)" }}
+        disabled={checkoutStatus === "loading" || checkoutStatus === "success"}
+        className="w-full py-3.5 rounded-xl text-sm font-medium text-black disabled:opacity-80 transition-all relative overflow-hidden"
+        style={{ background: buttonColors[checkoutStatus] }}
+        // Anima a troca de cor entre estados
+        animate={{ background: buttonColors[checkoutStatus] }}
       >
-        {/* Shimmer animado no botão */}
-        <motion.div
-          className="absolute inset-0 -skew-x-12"
-          style={{
-            background:
-              "linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)",
-          }}
-          animate={{ x: ["-100%", "200%"] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
-        />
-        <span className="relative z-10">
-          {checkingOut ? "Processando..." : "Finalizar pedido →"}
-        </span>
+        {checkoutStatus === "loading" && (
+          <motion.div
+            className="absolute inset-0 -skew-x-12"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)",
+            }}
+            animate={{ x: ["-100%", "200%"] }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+          />
+        )}
+        <motion.span
+          key={checkoutStatus}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative z-10"
+        >
+          {buttonLabels[checkoutStatus]}
+        </motion.span>
       </motion.button>
 
       {/* Selos de segurança */}

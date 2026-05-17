@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/router";
 import { useProtectedRoute } from "../hooks/useProtectedRoute";
@@ -8,6 +7,7 @@ import { useToast } from "../contexts/ToastContext";
 import QuantityControl from "../components/cart/QuantityControl";
 import { useOrderSummary } from "../hooks/useOrderSummary";
 import OrderSummary from "../components/cart/OrderSummary";
+import { useCheckout } from "../hooks/useCheckout";
 
 import api from "../services/api";
 
@@ -191,7 +191,7 @@ export default function CartPage() {
   // desnecessário e inconsistência de estado.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { cart, total, loading, refetch } = useCartContext();
-  const [checkingOut, setCheckingOut] = useState(false);
+  const { status: checkoutStatus, handleCheckout } = useCheckout();
   const { showToast } = useToast();
   const router = useRouter();
 
@@ -209,13 +209,6 @@ export default function CartPage() {
         </div>
       </div>
     );
-  }
-
-  // Função de checkout — será implementada no CART-04
-  async function handleCheckout() {
-    setCheckingOut(true);
-    // lógica virá na próxima task
-    setCheckingOut(false);
   }
 
   async function handleRemove(cartItemId: string) {
@@ -290,7 +283,7 @@ export default function CartPage() {
                       freeShippingProgress={summary.freeShippingProgress}
                       amountToFreeShipping={summary.amountToFreeShipping}
                       onCheckout={() => void handleCheckout()}
-                      checkingOut={checkingOut}
+                      checkoutStatus={checkoutStatus}
                     />
                   </div>
                 </p>
