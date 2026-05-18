@@ -9,9 +9,9 @@ import MobileMenu from "./MobileMenu";
 
 const navLinks = [
   { label: "Início", href: "/shop" },
-  { label: "Eletrônicos", href: "/shop?category=electronics" },
-  { label: "Gadgets", href: "/shop?category=gadgets" },
-  { label: "Ofertas", href: "/shop?category=offers" },
+  { label: "Eletrônicos", href: "/electronics" },
+  { label: "Gadgets", href: "/gadgets" },
+  { label: "Ofertas", href: "/offers" },
 ];
 
 export default function Header() {

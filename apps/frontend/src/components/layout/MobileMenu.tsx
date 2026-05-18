@@ -10,9 +10,9 @@ import Clock from "./Clock";
 
 const navLinks = [
   { label: "Início", href: "/shop", icon: "🏠" },
-  { label: "Eletrônicos", href: "/shop?category=electronics", icon: "📱" },
-  { label: "Gadgets", href: "/shop?category=gadgets", icon: "🎧" },
-  { label: "Ofertas", href: "/shop?category=offers", icon: "🏷️" },
+  { label: "Eletrônicos", href: "/electronics", icon: "📱" },
+  { label: "Gadgets", href: "/gadgets", icon: "🎧" },
+  { label: "Ofertas", href: "/offers", icon: "🏷️" },
   { label: "Meu carrinho", href: "/cart", icon: "🛒" },
   { label: "Meus pedidos", href: "/orders", icon: "📦" },
 ];
