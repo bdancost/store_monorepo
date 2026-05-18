@@ -1,10 +1,10 @@
-import { useRef } from "react";
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRouter } from "next/router";
 import { useProtectedRoute } from "../hooks/useProtectedRoute";
 import { useProducts } from "../hooks/useProducts";
 import ProductGrid from "../components/shop/ProductGrid";
-import { useState } from "react";
 
 // ─────────────────────────────────────────────
 // Dados de features — configuração como dado
@@ -69,12 +69,19 @@ export default function ElectronicsPage() {
       p.category.toLowerCase(),
     ),
   );
+  const [isMounted, setIsMounted] = useState(false);
 
   // Ref para a seção de produtos
   // useScroll rastreia o scroll dentro desse elemento
   const heroRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // 3. Passamos o target apenas se já estiver montado, caso contrário passamos undefined
   const { scrollYProgress } = useScroll({
-    target: heroRef,
+    target: isMounted ? heroRef : undefined,
     offset: ["start start", "end start"],
   });
 
