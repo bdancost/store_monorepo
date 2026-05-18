@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRouter } from "next/router";
 import { useProtectedRoute } from "../hooks/useProtectedRoute";
@@ -42,6 +43,12 @@ export default function GadgetsPage() {
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
   const { products, loading, error } = useProducts();
 
+  // 1. Estado seguro para evitar o erro de hidratação das partículas e dos refs
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const gadgets = products.filter((p) =>
     ["mobile-accessories", "mens-watches", "womens-watches"].includes(
       p.category.toLowerCase(),
@@ -50,7 +57,7 @@ export default function GadgetsPage() {
 
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
-    target: heroRef,
+    target: isMounted ? heroRef : undefined,
     offset: ["start start", "end start"],
   });
 
@@ -58,6 +65,12 @@ export default function GadgetsPage() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   if (checking) return null;
+
+  // 2. Se ainda não foi montado no cliente, mostramos um loading de fundo para o SSR
+  // Isto impede o Next.js de inventar valores de partículas no servidor que depois dão erro no browser
+  if (!isMounted) {
+    return <div className="min-h-screen bg-[#0a0a0f]" />;
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
