@@ -1,16 +1,12 @@
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/router";
 import { useProtectedRoute } from "../../hooks/useProtectedRoute";
 import { useOrders } from "../../hooks/useOrders";
+import { useCancelOrder } from "../../hooks/useCancelOrder";
 import OrderCard from "../../components/orders/OrderCard";
+import CancelOrderModal from "../../components/orders/CancelOrderModal";
 
-// ─────────────────────────────────────────────
-// Skeleton de listagem
-// Reproduz o layout dos cards para minimizar
-// o layout shift (mudança de layout ao carregar)
-// Layout shift é medido pelo Google no Core Web Vitals
-// — afeta SEO e percepção de qualidade do site
-// ─────────────────────────────────────────────
 function OrdersSkeleton() {
   return (
     <div className="flex flex-col gap-4">
@@ -18,9 +14,6 @@ function OrdersSkeleton() {
         <div
           key={i}
           className="h-28 rounded-2xl bg-white/[.04] border border-white/[.06] animate-pulse"
-          // Delay escalonado no skeleton — parece
-          // que os cards estão carregando em cascata
-          // pequeno detalhe que melhora muito a percepção
           style={{ animationDelay: `${i * 0.1}s` }}
         />
       ))}
@@ -28,12 +21,8 @@ function OrdersSkeleton() {
   );
 }
 
-// ─────────────────────────────────────────────
-// Empty state
-// ─────────────────────────────────────────────
 function EmptyOrders() {
   const router = useRouter();
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -41,8 +30,6 @@ function EmptyOrders() {
       className="flex flex-col items-center justify-center py-24 gap-5 text-center"
     >
       <motion.span
-        // Animação de balanço para chamar atenção
-        // sem ser intrusivo
         animate={{ rotate: [0, -5, 5, -5, 0] }}
         transition={{ duration: 0.8, delay: 0.4 }}
         className="text-6xl"
@@ -55,8 +42,6 @@ function EmptyOrders() {
           Quando você finalizar uma compra, seus pedidos aparecem aqui
         </p>
       </div>
-
-      {/* Call-to-action claro — nunca deixe o usuário sem direção */}
       <motion.button
         whileTap={{ scale: 0.96 }}
         onClick={() => void router.push("/shop")}
@@ -69,13 +54,38 @@ function EmptyOrders() {
   );
 }
 
-// ─────────────────────────────────────────────
-// Página principal
-// ─────────────────────────────────────────────
 export default function OrdersPage() {
   const { checking } = useProtectedRoute();
   const { orders, loading, error, refetch } = useOrders();
   const router = useRouter();
+
+  // Estado local do modal — só esta página precisa saber
+  // se o modal está aberto e qual pedido está sendo cancelado
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+
+  // useCallback aqui porque é passado para useCancelOrder
+  // como dependência — sem useCallback causaria loop
+  const handleCancelSuccess = useCallback(async () => {
+    await refetch();
+    setModalOpen(false);
+    setSelectedOrderId(null);
+  }, [refetch]);
+
+  const { cancellingId, cancelOrder } = useCancelOrder(handleCancelSuccess);
+
+  // Abre o modal de confirmação com o ID do pedido selecionado
+  // Não cancela diretamente — força confirmação do usuário
+  function handleCancelRequest(orderId: string) {
+    setSelectedOrderId(orderId);
+    setModalOpen(true);
+  }
+
+  // Executado quando o usuário confirma no modal
+  async function handleConfirmCancel() {
+    if (!selectedOrderId) return;
+    await cancelOrder(selectedOrderId);
+  }
 
   if (checking) return null;
 
@@ -90,7 +100,6 @@ export default function OrdersPage() {
         >
           <div>
             <h1 className="text-2xl font-medium text-white">Meus pedidos</h1>
-            {/* Contador de pedidos — só exibe quando carregou */}
             {!loading && orders.length > 0 && (
               <motion.p
                 initial={{ opacity: 0 }}
@@ -104,7 +113,6 @@ export default function OrdersPage() {
               </motion.p>
             )}
           </div>
-
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={() => void router.push("/shop")}
@@ -114,7 +122,7 @@ export default function OrdersPage() {
           </motion.button>
         </motion.div>
 
-        {/* Estado de erro com retry */}
+        {/* Estado de erro */}
         {error && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -123,7 +131,6 @@ export default function OrdersPage() {
           >
             <span className="text-4xl">⚠️</span>
             <p className="text-white/40 text-sm">{error}</p>
-            {/* Retry — usuário pode tentar novamente sem recarregar a página */}
             <button
               onClick={() => void refetch()}
               className="text-xs text-amber-400 border border-amber-400/30 px-4 py-2 rounded-lg hover:bg-amber-400/10 transition-colors"
@@ -133,7 +140,7 @@ export default function OrdersPage() {
           </motion.div>
         )}
 
-        {/* Conteúdo principal */}
+        {/* Conteúdo */}
         {!error && (
           <>
             {loading ? (
@@ -141,8 +148,6 @@ export default function OrdersPage() {
             ) : orders.length === 0 ? (
               <EmptyOrders />
             ) : (
-              // AnimatePresence para animar entrada dos cards
-              // e remoção quando um pedido é cancelado
               <AnimatePresence mode="popLayout">
                 <div className="flex flex-col gap-4">
                   {orders.map((order, i) => (
@@ -153,7 +158,13 @@ export default function OrdersPage() {
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ delay: i * 0.07 }}
                     >
-                      <OrderCard order={order} />
+                      <OrderCard
+                        order={order}
+                        // Passa a função que ABRE O MODAL
+                        // não a que cancela diretamente
+                        onCancel={handleCancelRequest}
+                        cancelling={cancellingId === order.id}
+                      />
                     </motion.div>
                   ))}
                 </div>
@@ -162,6 +173,20 @@ export default function OrdersPage() {
           </>
         )}
       </div>
+
+      {/* Modal de confirmação — fora do container principal
+          para garantir que o z-index funcione corretamente
+          independente do contexto de empilhamento */}
+      <CancelOrderModal
+        open={modalOpen}
+        orderId={selectedOrderId}
+        onConfirm={() => void handleConfirmCancel()}
+        onClose={() => {
+          setModalOpen(false);
+          setSelectedOrderId(null);
+        }}
+        loading={cancellingId !== null}
+      />
     </div>
   );
 }
