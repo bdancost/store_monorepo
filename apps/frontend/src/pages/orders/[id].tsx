@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useProtectedRoute } from "../../hooks/useProtectedRoute";
 import { useOrder } from "../../hooks/useOrder";
 import OrderStatusTimeline from "../../components/orders/OrderStatusTimeline";
+import StatusBadge from "../../components/orders/StatusBadge";
 
 // ─────────────────────────────────────────────
 // Skeleton da página
@@ -136,6 +137,9 @@ export default function OrderDetailPage() {
           </div>
 
           <p className="text-xs text-white/25 mt-3">{createdAt}</p>
+          <div className="mt-4 flex justify-center">
+            <StatusBadge status={order.status} />
+          </div>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

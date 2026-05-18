@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/router";
 import { useProtectedRoute } from "../../hooks/useProtectedRoute";
 import { useOrders } from "../../hooks/useOrders";
+import OrderCard from "../../components/orders/OrderCard";
 
 // ─────────────────────────────────────────────
 // Skeleton de listagem
@@ -152,18 +153,7 @@ export default function OrdersPage() {
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ delay: i * 0.07 }}
                     >
-                      {/* Card virá na ORDERS-02 */}
-                      <div
-                        onClick={() => void router.push(`/orders/${order.id}`)}
-                        className="p-5 rounded-2xl border border-white/[.06] bg-white/[.02] hover:border-amber-400/20 cursor-pointer transition-colors"
-                      >
-                        <p className="text-xs text-amber-400 font-mono">
-                          #{order.id.slice(0, 8).toUpperCase()}
-                        </p>
-                        <p className="text-sm text-white/60 mt-1">
-                          {order.status}
-                        </p>
-                      </div>
+                      <OrderCard order={order} />
                     </motion.div>
                   ))}
                 </div>
