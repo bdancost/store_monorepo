@@ -1,4 +1,5 @@
 /* eslint-disable import/no-anonymous-default-export */
+import "@testing-library/jest-dom";
 import nextJest from "next/jest.js";
 
 // Mock para evitar o erro de layout não implementado no JSDOM

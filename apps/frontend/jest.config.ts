@@ -8,7 +8,7 @@ const createJestConfig = nextJest({
 // Configurações base que o Next.js vai ler e mesclar corretamente
 const baseConfig = {
   testEnvironment: "jsdom",
-  setupFilesAfterFramework: ["<rootDir>/jest.setup.tsx"],
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.tsx"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
