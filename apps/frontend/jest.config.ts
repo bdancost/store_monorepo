@@ -1,4 +1,3 @@
-/* eslint-disable import/no-anonymous-default-export */
 import nextJest from "next/jest.js";
 
 const createJestConfig = nextJest({
@@ -6,21 +5,15 @@ const createJestConfig = nextJest({
   dir: "./",
 });
 
-// Configurações base que você quer aplicar
+// Configurações base que o Next.js vai ler e mesclar corretamente
 const baseConfig = {
-  testEnvironment: "jest-environment-jsdom",
+  testEnvironment: "jsdom",
+  setupFilesAfterFramework: ["<rootDir>/jest.setup.tsx"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   testMatch: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
 };
 
-// Força o Next.js a resolver a configuração e injeta o setup depois
-export default async () => {
-  const nextResolvedConfig = await createJestConfig(baseConfig)();
-
-  return {
-    ...nextResolvedConfig,
-    setupFilesAfterFramework: ["<rootDir>/jest.setup.tsx"], // ou .ts se preferir
-  };
-};
+// Deixe o Next.js gerenciar a exportação
+export default createJestConfig(baseConfig);

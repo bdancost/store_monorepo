@@ -1,6 +1,9 @@
 /* eslint-disable import/no-anonymous-default-export */
 import nextJest from "next/jest.js";
 
+// Mock para evitar o erro de layout não implementado no JSDOM
+Object.defineProperty(window, "scrollTo", { value: jest.fn(), writable: true });
+
 const createJestConfig = nextJest({
   dir: "./",
 });

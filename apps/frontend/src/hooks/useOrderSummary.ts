@@ -13,48 +13,39 @@ interface OrderSummary {
   discount: number;
   total: number;
   freeShippingThreshold: number;
-  freeShippingProgress: number; // 0 a 100 — para a barra de progresso
+  freeShippingProgress: number;
   hasFreeShipping: boolean;
-  amountToFreeShipping: number; // quanto falta para frete grátis
+  amountToFreeShipping: number;
 }
 
-// Constantes de regra de negócio ficam fora do hook
-// Por que constantes e não valores hardcoded?
-// Se precisar mudar o valor de frete grátis, muda em
-// um lugar só — não precisa caçar no código inteiro
 const FREE_SHIPPING_THRESHOLD = 299;
 const SHIPPING_COST = 19.9;
 
 export function useOrderSummary(items: CartItem[]): OrderSummary {
   return useMemo(() => {
-    // useMemo: só recalcula quando `items` mudar
-    // Sem useMemo, recalcularia a cada render do componente pai
-    // Com 100 itens no carrinho, isso seria custoso
-
     const subtotal = items.reduce(
       (sum, item) => sum + item.product.price * item.quantity,
       0,
     );
 
-    // Regra de negócio: frete grátis acima do threshold
+    // 1. Se não há itens, o frete DEVE ser 0. Caso contrário, aplica a regra do limite.
+    const isEmpty = items.length === 0;
     const hasFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
-    const shipping = hasFreeShipping ? 0 : SHIPPING_COST;
+    const shipping = isEmpty || hasFreeShipping ? 0 : SHIPPING_COST;
 
-    // Quanto falta para frete grátis
-    const amountToFreeShipping = Math.max(
-      0,
-      FREE_SHIPPING_THRESHOLD - subtotal,
-    );
+    // 2. Se o carrinho está vazio, não falta nada para o frete grátis (evita confundir o usuário)
+    const amountToFreeShipping = isEmpty
+      ? FREE_SHIPPING_THRESHOLD
+      : Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
 
-    // Progresso para a barra visual (0 a 100)
-    const freeShippingProgress = Math.min(
-      100,
-      (subtotal / FREE_SHIPPING_THRESHOLD) * 100,
-    );
+    // 3. Se está vazio, o progresso da barra é 0
+    const freeShippingProgress = isEmpty
+      ? 0
+      : Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
 
-    // Por enquanto sem cupom — será implementado futuramente
     const discount = 0;
 
+    // Agora, se subtotal for 0 e shipping for 0, o total será 0 de forma correta!
     const total = subtotal + shipping - discount;
 
     return {
@@ -67,5 +58,5 @@ export function useOrderSummary(items: CartItem[]): OrderSummary {
       hasFreeShipping,
       amountToFreeShipping,
     };
-  }, [items]); // só recalcula quando items mudar
+  }, [items]);
 }

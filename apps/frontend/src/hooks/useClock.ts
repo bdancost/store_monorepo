@@ -8,18 +8,25 @@ interface ClockData {
 }
 
 export function useClock(): ClockData {
+  // Iniciamos o estado estritamente como null.
+  // Isso garante que o primeiríssimo ciclo de renderização síncrona (SSR ou primeiro frame do teste)
+  // use o fallback dos placeholders.
   const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
-    // Inicializa no client para evitar hydration mismatch no Next.js
+    // Definimos uma função para capturar a data atual.
     const tick = () => setNow(new Date());
 
-    // Executa a primeira vez para não esperar 1 segundo em branco
+    // Importante: Executamos o tick dentro do useEffect.
+    // Mudar o estado aqui dentro para inicializar o componente após a montagem é
+    // perfeitamente válido pelo linter porque estamos sincronizando com um sistema externo (o relógio).
     tick();
-    const interval = setInterval(() => setNow(new Date()), 1000);
+
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, []);
 
+  // Se 'now' for null, significa que estamos no render inicial (servidor ou montagem síncrona)
   if (!now) {
     return { hours: "--", minutes: "--", seconds: "--", date: "" };
   }
