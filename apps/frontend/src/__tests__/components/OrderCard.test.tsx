@@ -1,58 +1,67 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import "@testing-library/jest-dom"; // Correção do 'toBeInTheDocument'
-import { useRouter } from "next/navigation"; // Ajuste para 'next/router' se usar Pages Router
+import "@testing-library/jest-dom";
 import OrderCard from "../../components/orders/OrderCard";
 
+// 1. Funções de controle do Mock mapeadas fora do escopo
+const mockPush = jest.fn();
+
+// 2. Mock do pacote correto ('next/router')
 jest.mock("next/router", () => ({
   useRouter() {
     return {
       route: "/",
       pathname: "",
-      query: "",
+      query: {},
       asPath: "",
-      push: jest.fn(),
+      push: mockPush,
       replace: jest.fn(),
+      reload: jest.fn(),
+      back: jest.fn(),
+      prefetch: jest.fn().mockResolvedValue(true),
+      beforePopState: jest.fn(),
+      events: {
+        on: jest.fn(),
+        off: jest.fn(),
+        emit: jest.fn(),
+      },
+      isFallback: false,
     };
   },
 }));
 
-// 1. Mock do módulo do Next.js
-jest.mock("next/navigation", () => ({
-  useRouter: jest.fn(),
-}));
-
-// Mock do tipo do componente (ajuste com as propriedades reais do seu OrderCard)
+// 3. Mock atualizado com o status em CAIXA ALTA para o StatusBadge encontrar as classes
 const mockOrder = {
   id: "123",
-  status: "pending",
+  status: "PENDING",
   total: 999.99,
-  createdAt: new Date().toISOString(),
-  items: [{ id: "i1", name: "Item 1", quantity: 1, price: 999.99 }],
+  createdAt: new Date("2026-05-20T15:00:00.000Z").toISOString(),
+  items: [
+    {
+      id: "i1",
+      quantity: 1,
+      price: 999.99,
+      product: {
+        title: "Pedido Especial",
+      },
+    },
+  ],
 } as any;
 
 describe("OrderCard Component", () => {
-  const mockPush = jest.fn();
-
   beforeEach(() => {
     jest.clearAllMocks();
-
-    // 2. Configuração correta do retorno do useRouter mockado
-    (useRouter as jest.Mock).mockReturnValue({
-      push: mockPush,
-      refresh: jest.fn(),
-      back: jest.fn(),
-    });
   });
 
   it("deve renderizar os dados do pedido corretamente", () => {
     render(<OrderCard order={mockOrder} />);
 
-    // Verifica o título do pedido
-    expect(screen.getByText("Pedido de Teste")).toBeInTheDocument();
+    // Valida o número do pedido e o título formatado
+    expect(screen.getByText(/123/)).toBeInTheDocument();
+    expect(screen.getByText(/Pedido Especial/i)).toBeInTheDocument();
 
-    // 3. Correção do erro de espaço da moeda (Usa Regex para evitar falha do non-breaking space)
+    // Valida o preço aceitando qualquer caractere de espaçamento (Intl BRL)
     expect(screen.getByText(/R\$.*999,99/)).toBeInTheDocument();
   });
 
@@ -60,25 +69,20 @@ describe("OrderCard Component", () => {
     const user = userEvent.setup();
     render(<OrderCard order={mockOrder} />);
 
-    const card =
-      screen.getByRole("button", { name: /ver detalhes/i }) ||
-      screen.getByTestId("order-card");
-    await user.click(card);
+    // Conforme o log do DOM, o clique ocorre na área interna que possui o texto do ID do pedido
+    const clickableArea =
+      screen.getByText(/123/).closest(".cursor-pointer") ||
+      screen.getByText(/123/);
 
-    // Verifica se a navegação foi chamada com a rota esperada
+    await user.click(clickableArea);
+
     expect(mockPush).toHaveBeenCalledWith("/orders/123");
   });
 
-  it("deve lidar com interações assíncronas sem erro de act()", async () => {
-    const user = userEvent.setup();
+  it("deve renderizar o status correspondente corretamente", () => {
     render(<OrderCard order={mockOrder} />);
 
-    const actionButton = screen.getByRole("button", { name: /adicionar/i });
-    await user.click(actionButton);
-
-    // 4. Correção do erro de 'act()': espera a atualização de estado assíncrona acontecer
-    await waitFor(() => {
-      expect(screen.getByText(/adicionado/i)).toBeInTheDocument();
-    });
+    // O subcomponente StatusBadge renderizou "Aguardando pagamento"
+    expect(screen.getByText(/Aguardando pagamento/i)).toBeInTheDocument();
   });
 });
