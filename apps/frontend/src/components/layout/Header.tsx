@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -6,6 +7,7 @@ import Clock from "./Clock";
 import CartButton from "./CartButton";
 import UserMenu from "./UserMenu";
 import MobileMenu from "./MobileMenu";
+import { useCommandPaletteContext } from "../../contexts/CommandPaletteContext";
 
 const navLinks = [
   { label: "Início", href: "/shop" },
@@ -17,6 +19,7 @@ const navLinks = [
 export default function Header() {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { openPalette } = useCommandPaletteContext();
 
   return (
     <>
@@ -96,6 +99,22 @@ export default function Header() {
 
           {/* Lado direito desktop */}
           <div className="hidden md:flex items-center gap-3 ml-auto">
+            <motion.button
+              onClick={openPalette}
+              whileTap={{ scale: 0.95 }}
+              className="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl border border-white/[.08] bg-white/[.04] hover:border-amber-400/30 transition-colors"
+            >
+              <span className="text-white/30 text-sm">🔍</span>
+              <span className="text-xs text-white/25">Buscar</span>
+              <kbd className="flex items-center gap-0.5 ml-1">
+                <span className="px-1.5 py-0.5 rounded bg-white/[.06] text-[9px] text-white/20 font-mono">
+                  ⌘
+                </span>
+                <span className="px-1.5 py-0.5 rounded bg-white/[.06] text-[9px] text-white/20 font-mono">
+                  K
+                </span>
+              </kbd>
+            </motion.button>
             <CartButton />
             <div className="w-px h-5 bg-white/10" />
             <UserMenu />

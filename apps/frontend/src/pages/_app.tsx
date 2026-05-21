@@ -4,6 +4,7 @@ import Header from "../components/layout/Header";
 import { CartProvider } from "../contexts/CartContext";
 import { ToastProvider } from "../contexts/ToastContext";
 import InstallBanner from "../components/pwa/InstallBanner";
+import { CommandPaletteProvider } from "../contexts/CommandPaletteContext";
 import "../styles/globals.css";
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -13,11 +14,13 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <ToastProvider>
       <CartProvider>
-        {showHeader && <Header />}
-        <main className={showHeader ? "pt-16" : ""}>
-          <Component {...pageProps} />
-        </main>
-        <InstallBanner />
+        <CommandPaletteProvider>
+          {showHeader && <Header />}
+          <main className={showHeader ? "pt-16" : ""}>
+            <Component {...pageProps} />
+          </main>
+          <InstallBanner />
+        </CommandPaletteProvider>
       </CartProvider>
     </ToastProvider>
   );
