@@ -6,19 +6,10 @@ import { useOrders } from "../../hooks/useOrders";
 import { useCancelOrder } from "../../hooks/useCancelOrder";
 import OrderCard from "../../components/orders/OrderCard";
 import CancelOrderModal from "../../components/orders/CancelOrderModal";
+import { OrdersListSkeleton } from "../../components/ui/skeletons/OrderCardSkeleton";
 
 function OrdersSkeleton() {
-  return (
-    <div className="flex flex-col gap-4">
-      {[...Array(3)].map((_, i) => (
-        <div
-          key={i}
-          className="h-28 rounded-2xl bg-white/[.04] border border-white/[.06] animate-pulse"
-          style={{ animationDelay: `${i * 0.1}s` }}
-        />
-      ))}
-    </div>
-  );
+  return <OrdersListSkeleton count={4} />;
 }
 
 function EmptyOrders() {

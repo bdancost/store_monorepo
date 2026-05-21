@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./skeleton.css";
 
 @source "../pages/**/*.{ts,tsx,js,jsx}";
 @source "../components/**/*.{ts,tsx,js,jsx}";

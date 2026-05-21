@@ -7,6 +7,7 @@ import InstallBanner from "../components/pwa/InstallBanner";
 import { CommandPaletteProvider } from "../contexts/CommandPaletteContext";
 import { NotificationsProvider } from "../contexts/NotificationsContext";
 import "../styles/globals.css";
+import "../styles/skeleton.css";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();

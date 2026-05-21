@@ -10,7 +10,9 @@ import CategoryFilters from "../components/shop/CategoryFilters";
 import SortSelect from "../components/shop/SortSelect";
 import Pagination from "../components/shop/Pagination";
 import CartDrawer from "../components/shop/CartDrawer";
+import { ProductGridSkeleton } from "../components/ui/skeletons/ProductCardSkeleton";
 import { useMemo } from "react";
+import { SkeletonBox } from "../components/ui/Skeleton";
 
 function HeroBanner({ userName }: { userName: string }) {
   return (
@@ -95,17 +97,18 @@ function HeroBanner({ userName }: { userName: string }) {
 
 function PageSkeleton() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] px-6 py-8 max-w-7xl mx-auto animate-pulse">
-      <div className="h-40 rounded-2xl bg-white/[.04] mb-8" />
-      <div className="flex gap-3 mb-6">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-9 w-24 rounded-full bg-white/[.04]" />
-        ))}
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {[...Array(8)].map((_, i) => (
-          <div key={i} className="h-64 rounded-2xl bg-white/[.04]" />
-        ))}
+    <div className="min-h-screen bg-[#0a0a0f]">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+        {/* Hero skeleton */}
+        <div className="h-48 rounded-2xl skeleton-shimmer mb-8" />
+        {/* Filtros skeleton */}
+        <div className="flex gap-3 mb-6">
+          {[...Array(5)].map((_, i) => (
+            <SkeletonBox key={i} width={80} height={36} rounded="full" />
+          ))}
+        </div>
+        {/* Grid skeleton com delay escalonado */}
+        <ProductGridSkeleton count={8} />
       </div>
     </div>
   );

@@ -7,6 +7,11 @@ import { useProfileStats } from "../hooks/useProfileStats";
 import { useAuth } from "../hooks/useAuth";
 import StatCard from "../components/profile/StatCard";
 import StatusBadge from "../components/orders/StatusBadge";
+import {
+  ProfileHeroSkeleton,
+  ProfileStatsSkeleton,
+} from "../components/ui/skeletons/ProfileSkeleton";
+import { SkeletonBox } from "../components/ui/Skeleton";
 
 // ─────────────────────────────────────────────
 // Seção reutilizável com título
@@ -33,16 +38,31 @@ function Section({
 // ─────────────────────────────────────────────
 // Skeleton
 // ─────────────────────────────────────────────
-function ProfileSkeleton() {
+function PageSkeleton() {
   return (
-    <div className="animate-pulse flex flex-col gap-8">
-      <div className="h-32 rounded-2xl bg-white/[.04]" />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-32 rounded-2xl bg-white/[.04]" />
-        ))}
+    <div className="min-h-screen bg-[#0a0a0f]">
+      <div className="max-w-3xl mx-auto px-4 md:px-6 py-8 flex flex-col gap-8">
+        <ProfileHeroSkeleton />
+        <ProfileStatsSkeleton />
+        {/* Seção de conta skeleton */}
+        <div className="rounded-2xl border border-white/[.06] overflow-hidden">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="flex items-center justify-between px-5 py-4 border-b border-white/[.04] last:border-0"
+            >
+              <div className="flex items-center gap-3">
+                <SkeletonBox width={32} height={32} rounded="lg" />
+                <div className="flex flex-col gap-1.5">
+                  <SkeletonBox width={60} height={10} />
+                  <SkeletonBox width={140} height={14} />
+                </div>
+              </div>
+              <SkeletonBox width={50} height={12} rounded="full" />
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="h-48 rounded-2xl bg-white/[.04]" />
     </div>
   );
 }
@@ -59,7 +79,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen bg-[#0a0a0f]">
         <div className="max-w-3xl mx-auto px-4 md:px-6 py-8">
-          <ProfileSkeleton />
+          <PageSkeleton />
         </div>
       </div>
     );
