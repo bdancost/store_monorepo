@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, OrderStatus } from '@prisma/client';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 
 type OrderWithItems = Prisma.OrderGetPayload<{
   include: {
@@ -23,7 +24,10 @@ type PlainOrder = Prisma.OrderGetPayload<Record<never, never>>;
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsGateway,
+  ) {}
 
   async createFromCart(userId: string): Promise<PlainOrder> {
     const cart = await this.prisma.cart.findUnique({
@@ -121,10 +125,29 @@ export class OrdersService {
       throw new NotFoundException('Pedido não encontrado');
     }
 
-    return this.prisma.order.update({
+    const updated = await this.prisma.order.update({
       where: { id: orderId },
       data: { status },
     });
+
+    // Notifica o usuário em tempo real sobre a mudança de status
+    // O cliente não precisa fazer polling — recebe instantaneamente
+    const statusMessages: Record<OrderStatus, string> = {
+      PENDING: 'Pedido recebido e aguardando pagamento',
+      PAID: 'Pagamento confirmado! Preparando seu pedido 📦',
+      SHIPPED: 'Seu pedido está a caminho! 🚚',
+      DELIVERED: 'Pedido entregue com sucesso! 🎉',
+      CANCELLED: 'Seu pedido foi cancelado',
+    };
+
+    this.notifications.notifyUser(order.userId, 'order:status_changed', {
+      orderId: order.id,
+      oldStatus: order.status,
+      newStatus: status,
+      message: statusMessages[status],
+    });
+
+    return updated;
   }
 
   async cancel(userId: string, orderId: string): Promise<PlainOrder> {

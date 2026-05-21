@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { envSchema } from './config/env.validation';
 import { OrdersModule } from './orders/orders.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { OrdersModule } from './orders/orders.module';
     UsersModule,
     CartModule,
     OrdersModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
