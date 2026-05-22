@@ -1,4 +1,6 @@
 @import "tailwindcss";
+
+@import "./themes.css";
 @import "./skeleton.css";
 
 @source "../pages/**/*.{ts,tsx,js,jsx}";
@@ -9,9 +11,12 @@
 }
 
 body {
-  background: #0a0a0f;
-  color: #fff;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
   font-family: var(--font-sans, system-ui, sans-serif);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 ::-webkit-scrollbar {
@@ -19,14 +24,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0f;
+  background: var(--bg-base);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(212, 175, 55, 0.3);
+  background: var(--gold-muted);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(212, 175, 55, 0.6);
+  background: var(--gold-primary);
 }

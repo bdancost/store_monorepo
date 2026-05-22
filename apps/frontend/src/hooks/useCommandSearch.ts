@@ -51,6 +51,8 @@ function getScore(text: string, query: string): number {
 interface UseCommandSearchProps {
   products: Product[];
   onClose: () => void;
+  toggleTheme: () => void;
+  isDark: boolean;
 }
 
 interface UseCommandSearchReturn {
@@ -179,12 +181,14 @@ export function useCommandSearch({
       {
         id: "action-theme",
         label: "Alternar tema",
-        description: "Claro / Escuro",
-        icon: "🌙",
+        description: isDark
+          ? "Mudar para tema claro"
+          : "Mudar para tema escuro",
+        icon: isDark ? "☀️" : "🌙",
         group: "ações",
         keywords: ["tema", "theme", "dark", "light", "escuro", "claro"],
         onSelect: () => {
-          // Será implementado no UX-05
+          toggleTheme();
           onClose();
         },
       },

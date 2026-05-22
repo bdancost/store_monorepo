@@ -1,3 +1,4 @@
+import { ThemeProvider } from "next-themes";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
 import Header from "../components/layout/Header";
@@ -14,18 +15,31 @@ export default function App({ Component, pageProps }: AppProps) {
   const showHeader = router.pathname !== "/auth";
 
   return (
-    <ToastProvider>
-      <CartProvider>
-        <NotificationsProvider>
-          <CommandPaletteProvider>
-            {showHeader && <Header />}
-            <main className={showHeader ? "pt-16" : ""}>
-              <Component {...pageProps} />
-            </main>
-            <InstallBanner />
-          </CommandPaletteProvider>
-        </NotificationsProvider>
-      </CartProvider>
-    </ToastProvider>
+    // ThemeProvider deve ser o mais externo possível
+    // attribute="data-theme": usa data-theme no <html>
+    // em vez de class — funciona melhor com CSS variables
+    // defaultTheme="dark": padrão escuro (nossa identidade)
+    // enableSystem: respeita a preferência do sistema operacional
+    // storageKey: chave do localStorage para persistência
+    <ThemeProvider
+      attribute="data-theme"
+      defaultTheme="dark"
+      enableSystem
+      storageKey="luxtech-theme"
+    >
+      <ToastProvider>
+        <CartProvider>
+          <NotificationsProvider>
+            <CommandPaletteProvider>
+              {showHeader && <Header />}
+              <main className={showHeader ? "pt-16" : ""}>
+                <Component {...pageProps} />
+              </main>
+              <InstallBanner />
+            </CommandPaletteProvider>
+          </NotificationsProvider>
+        </CartProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }

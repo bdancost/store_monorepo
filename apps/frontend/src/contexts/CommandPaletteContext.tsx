@@ -1,6 +1,9 @@
 import { createContext, useContext, ReactNode } from "react";
 import { useCommandPalette } from "../hooks/useCommandPalette";
 import CommandPalette from "../components/command/CommandPalette";
+import { useTheme } from "../hooks/useTheme";
+
+const { toggleTheme, isDark } = useTheme();
 
 interface CommandPaletteContextType {
   open: boolean;
@@ -13,6 +16,13 @@ const CommandPaletteContext = createContext<CommandPaletteContextType>({
   openPalette: () => {},
   closePalette: () => {},
 });
+
+<CommandPalette
+  open={open}
+  onClose={closePalette}
+  toggleTheme={toggleTheme}
+  isDark={isDark}
+/>;
 
 export function CommandPaletteProvider({ children }: { children: ReactNode }) {
   const { open, openPalette, closePalette } = useCommandPalette();

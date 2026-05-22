@@ -7,6 +7,7 @@ import { useCartContext } from "../../contexts/CartContext";
 import { useUser } from "../../hooks/useUser";
 import { useAuth } from "../../hooks/useAuth";
 import Clock from "./Clock";
+import ThemeToggle from "../ui/ThemeToggle";
 
 const navLinks = [
   { label: "Início", href: "/shop", icon: "🏠" },
@@ -104,6 +105,10 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
               </div>
 
               <Clock />
+
+              <div className="px-5 py-3 border-t border-white/[.06]">
+                <ThemeToggle variant="full" />
+              </div>
 
               <motion.button
                 onClick={onClose}
