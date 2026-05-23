@@ -9,7 +9,6 @@ import UserMenu from "./UserMenu";
 import MobileMenu from "./MobileMenu";
 import { useCommandPaletteContext } from "../../contexts/CommandPaletteContext";
 import NotificationsBell from "../notifications/NotificationsBell";
-import ThemeToggle from "../ui/ThemeToggle";
 
 const navLinks = [
   { label: "Início", href: "/shop" },
@@ -117,11 +116,6 @@ export default function Header() {
                 </span>
               </kbd>
             </motion.button>
-            <div
-              className="w-px h-5"
-              style={{ background: "var(--border-default)" }}
-            />
-            <ThemeToggle />
             <div className="w-px h-5 bg-white/10" />
             <NotificationsBell />
             <div className="w-px h-5 bg-white/10" />

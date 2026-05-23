@@ -181,14 +181,11 @@ export function useCommandSearch({
       {
         id: "action-theme",
         label: "Alternar tema",
-        description: isDark
-          ? "Mudar para tema claro"
-          : "Mudar para tema escuro",
-        icon: isDark ? "☀️" : "🌙",
+        description: "Claro / Escuro",
+        icon: "🌙",
         group: "ações",
         keywords: ["tema", "theme", "dark", "light", "escuro", "claro"],
         onSelect: () => {
-          toggleTheme();
           onClose();
         },
       },

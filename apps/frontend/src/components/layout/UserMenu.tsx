@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/router";
 import { useUser } from "../../hooks/useUser";
 import { useAuth } from "../../hooks/useAuth";
-import ThemeToggle from "../ui/ThemeToggle";
 
 interface MenuItem {
   icon: string;
@@ -141,9 +140,6 @@ export default function UserMenu() {
                   Membro Premium
                 </span>
               </div>
-            </div>
-            <div className="px-3 pb-2 border-b border-white/[.06]">
-              <ThemeToggle variant="full" />
             </div>
 
             {/* Itens do menu */}
