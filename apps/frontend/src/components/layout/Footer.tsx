@@ -28,7 +28,7 @@ const FOOTER_LINKS = [
   {
     title: "Empresa",
     links: [
-      { label: "Sobre nós", href: "#" },
+      { label: "Sobre nós", href: "/about" },
       { label: "Carreiras", href: "#" },
       { label: "Blog", href: "#" },
       { label: "Imprensa", href: "#" },
