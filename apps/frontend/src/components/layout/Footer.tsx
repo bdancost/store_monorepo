@@ -29,7 +29,7 @@ const FOOTER_LINKS = [
     title: "Empresa",
     links: [
       { label: "Sobre nós", href: "/about" },
-      { label: "Carreiras", href: "#" },
+      { label: "Carreiras", href: "/careers" },
       { label: "Blog", href: "#" },
       { label: "Imprensa", href: "#" },
     ],
