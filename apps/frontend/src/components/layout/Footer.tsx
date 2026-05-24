@@ -30,7 +30,7 @@ const FOOTER_LINKS = [
     links: [
       { label: "Sobre nós", href: "/about" },
       { label: "Carreiras", href: "/careers" },
-      { label: "Blog", href: "#" },
+      { label: "Blog", href: "/blog" },
       { label: "Imprensa", href: "#" },
     ],
   },
