@@ -344,9 +344,13 @@ function TimelineSection() {
               {/* Ícone na linha */}
               <div className="flex flex-col items-center shrink-0">
                 <motion.div
-                  whileInView={{ scale: [0, 1.2, 1] }}
+                  whileInView={{ scale: [0, 1] }} // <--- Apenas início e fim
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 + 0.2, type: "spring" }}
+                  transition={{
+                    delay: i * 0.1 + 0.2,
+                    type: "spring",
+                    bounce: 0.4,
+                  }} // <--- Adicionado bounce para dar o efeito elástico
                   className="w-16 h-16 rounded-2xl border border-amber-400/20 bg-amber-400/10 flex items-center justify-center text-2xl z-10"
                 >
                   {milestone.icon}
