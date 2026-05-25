@@ -31,7 +31,7 @@ const FOOTER_LINKS = [
       { label: "Sobre nós", href: "/about" },
       { label: "Carreiras", href: "/careers" },
       { label: "Blog", href: "/blog" },
-      { label: "Imprensa", href: "#" },
+      { label: "Imprensa", href: "/press" },
     ],
   },
   {
