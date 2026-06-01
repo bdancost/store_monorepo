@@ -40,7 +40,7 @@ const FOOTER_LINKS = [
       { label: "Central de ajuda", href: "/help" },
       { label: "Fale conosco", href: "/contact" },
       { label: "Trocas e devoluções", href: "/returns" },
-      { label: "Rastrear pedido", href: "#" },
+      { label: "Rastrear pedido", href: "/track" },
     ],
   },
 ];
