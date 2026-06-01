@@ -83,37 +83,38 @@ Browser → Next.js (SSR/CSR)
 
 ### Backend
 
-| Tecnologia | Versão | Uso |
-|---|---|---|
-| NestJS | 10.x | Framework principal — módulos, DI, guards |
-| TypeScript | 5.x | Tipagem estática em todo o projeto |
-| Prisma ORM | 5.x | ORM type-safe, migrations, relations |
-| PostgreSQL | 15.x | Banco de dados relacional principal |
-| JWT + Bcrypt | — | Autenticação e hash de senhas |
-| Zod | 3.x | Validação de schema em runtime |
-| Socket.IO | 4.x | WebSocket para notificações em tempo real |
-| Jest | 29.x | Testes unitários e e2e |
-| Helmet | — | Headers de segurança HTTP |
-| Throttler | — | Rate limiting (10 req/min) |
+| Tecnologia   | Versão | Uso                                       |
+| ------------ | ------ | ----------------------------------------- |
+| NestJS       | 10.x   | Framework principal — módulos, DI, guards |
+| TypeScript   | 5.x    | Tipagem estática em todo o projeto        |
+| Prisma ORM   | 5.x    | ORM type-safe, migrations, relations      |
+| PostgreSQL   | 15.x   | Banco de dados relacional principal       |
+| JWT + Bcrypt | —      | Autenticação e hash de senhas             |
+| Zod          | 3.x    | Validação de schema em runtime            |
+| Socket.IO    | 4.x    | WebSocket para notificações em tempo real |
+| Jest         | 29.x   | Testes unitários e e2e                    |
+| Helmet       | —      | Headers de segurança HTTP                 |
+| Throttler    | —      | Rate limiting (10 req/min)                |
 
 ### Frontend
 
-| Tecnologia | Versão | Uso |
-|---|---|---|
-| Next.js | 14.x | Framework React com SSR/SSG |
-| TypeScript | 5.x | Tipagem estática |
-| Tailwind CSS | 3.x | Utilitários CSS |
-| Framer Motion | 11.x | Animações e transições |
-| Axios | 1.x | HTTP client com interceptors |
-| Socket.IO Client | 4.x | WebSocket client |
-| React Testing Library | 14.x | Testes de componentes |
-| Jest | 29.x | Test runner |
+| Tecnologia            | Versão | Uso                          |
+| --------------------- | ------ | ---------------------------- |
+| Next.js               | 14.x   | Framework React com SSR/SSG  |
+| TypeScript            | 5.x    | Tipagem estática             |
+| Tailwind CSS          | 3.x    | Utilitários CSS              |
+| Framer Motion         | 11.x   | Animações e transições       |
+| Axios                 | 1.x    | HTTP client com interceptors |
+| Socket.IO Client      | 4.x    | WebSocket client             |
+| React Testing Library | 14.x   | Testes de componentes        |
+| Jest                  | 29.x   | Test runner                  |
 
 ---
 
 ## ✅ Features implementadas
 
 ### 🔐 Autenticação & Segurança
+
 - [x] Registro e login com hash bcrypt (salt rounds: 10)
 - [x] JWT com expiração configurável
 - [x] AuthGuard protegendo rotas privadas
@@ -123,6 +124,7 @@ Browser → Next.js (SSR/CSR)
 - [x] Proteção contra user enumeration attack
 
 ### 🛒 E-commerce Core
+
 - [x] Catálogo com 100+ produtos (sync automático da DummyJSON API)
 - [x] Carrinho persistente por usuário (um por conta)
 - [x] Ownership validation — usuário só acessa seus próprios dados
@@ -132,6 +134,7 @@ Browser → Next.js (SSR/CSR)
 - [x] Transações Prisma para operações atômicas
 
 ### 🔔 Tempo real
+
 - [x] WebSocket com Socket.IO
 - [x] Autenticação JWT no handshake
 - [x] Rooms por usuário (suporte a múltiplas abas)
@@ -139,6 +142,7 @@ Browser → Next.js (SSR/CSR)
 - [x] Ping/pong keepalive (30s) para proxies corporativos
 
 ### 🎨 Frontend
+
 - [x] Design system premium preto + dourado
 - [x] Header responsivo com relógio em tempo real
 - [x] Command Palette global (⌘K) com fuzzy search próprio
@@ -152,6 +156,7 @@ Browser → Next.js (SSR/CSR)
 - [x] Paginação com 12 itens por página
 
 ### 📄 Páginas
+
 - [x] Auth (Login/Register) com switch animado
 - [x] Shop com filtros, busca e categorias
 - [x] Eletrônicos, Gadgets e Ofertas com hero parallax
@@ -169,6 +174,7 @@ Browser → Next.js (SSR/CSR)
 - [x] Rastrear Pedido com timeline animada
 
 ### 🧪 Testes
+
 - [x] Unitários backend: AuthService, CartService, OrdersService
 - [x] Unitários frontend: useClock, useProductFilters, useOrderSummary
 - [x] Hooks de negócio: useAuth, useCartItem, useCheckout
@@ -185,6 +191,7 @@ Browser → Next.js (SSR/CSR)
 Cada domínio (auth, users, products, cart, orders) tem seu próprio módulo com providers, controllers e services isolados. O `PrismaModule` é `@Global()` — disponível em todos os módulos sem reimportar.
 
 **Validação em camadas**
+
 - Zod valida o schema dos DTOs em runtime
 - Guards validam autenticação antes de chegar no controller
 - Services validam regras de negócio (ownership, status de pedido)
@@ -213,6 +220,7 @@ No `useCartItem`, a quantidade é atualizada na tela imediatamente. A API é cha
 A Command Palette implementa fuzzy search sem biblioteca: percorre o texto verificando se todos os caracteres da query aparecem na mesma ordem. Adiciona score de relevância (exato > começa com > contém > fuzzy).
 
 **Service Worker com estratégias de cache**
+
 - `CacheFirst` para assets estáticos (1 ano TTL)
 - `NetworkFirst` para chamadas de API (5 min TTL)
 - `StaleWhileRevalidate` para páginas (24h TTL)
@@ -230,7 +238,7 @@ A Command Palette implementa fuzzy search sem biblioteca: percorre o texto verif
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/my-store-monorepo.git
+git clone https://github.com/bdancost/store_monorepo.git
 cd my-store-monorepo
 ```
 
@@ -265,12 +273,12 @@ npm run dev
 
 ### 5. Acesse
 
-| Serviço | URL |
-|---|---|
-| Frontend | http://localhost:3001 |
-| Backend API | http://localhost:3000/api/v1 |
+| Serviço      | URL                            |
+| ------------ | ------------------------------ |
+| Frontend     | http://localhost:3001          |
+| Backend API  | http://localhost:3000/api/v1   |
 | Swagger Docs | http://localhost:3000/api/docs |
-| PostgreSQL | localhost:5434 |
+| PostgreSQL   | localhost:5434                 |
 
 ---
 
@@ -372,38 +380,43 @@ NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
 ## 🏛 Decisões de arquitetura
 
 ### Por que monorepo?
+
 Frontend e backend compartilham tipos e ficam em um único repositório para facilitar manutenção, versionamento conjunto e CI/CD unificado.
 
 ### Por que Zod em vez de class-validator?
+
 Zod é type-safe por design — o tipo TypeScript é inferido automaticamente do schema. Com `class-validator`, você escreve a validação e o tipo separadamente, correndo risco de dessincronização.
 
 ### Por que Prisma em vez de TypeORM?
+
 Prisma gera tipos TypeScript diretamente do schema, garantindo que o banco e o código estejam sempre sincronizados. TypeORM requer decorators e tem tipos menos precisos.
 
 ### Por que snapshot de preço?
+
 Se um produto muda de preço após a compra, o histórico de pedidos deve mostrar o valor original. Sem snapshot, `OrderItem.product.price` mostraria o preço atual — erro de billing.
 
 ### Por que derived state com useMemo?
+
 Armazenar em `useState` algo que pode ser calculado cria dois estados que precisam ser sincronizados manualmente — fonte clássica de bugs. `useMemo` calcula automaticamente quando a dependência muda.
 
 ---
 
 ## 📊 Cobertura de testes
 
-| Módulo | Testes | Cobertura |
-|---|---|---|
-| AuthService | 8 testes | Hashing, login, JWT, erros |
-| CartService | 7 testes | CRUD, ownership, transactions |
-| OrdersService | 9 testes | Criação, cancel, regras de negócio |
-| useClock | 6 testes | Formatação, debounce, cleanup |
+| Módulo            | Testes    | Cobertura                            |
+| ----------------- | --------- | ------------------------------------ |
+| AuthService       | 8 testes  | Hashing, login, JWT, erros           |
+| CartService       | 7 testes  | CRUD, ownership, transactions        |
+| OrdersService     | 9 testes  | Criação, cancel, regras de negócio   |
+| useClock          | 6 testes  | Formatação, debounce, cleanup        |
 | useProductFilters | 11 testes | Filtros, busca, ordenação, paginação |
-| useOrderSummary | 8 testes | Cálculos, frete, edge cases |
-| useAuth | 7 testes | Login, register, logout, loading |
-| useCartItem | 6 testes | Optimistic UI, debounce, reverter |
-| useCheckout | 7 testes | State machine, duplo clique, erros |
-| StatusBadge | 6 testes | Todos os status, ícones, dot |
-| OrderCard | 9 testes | Render, navegação, cancelamento |
-| ProductCard | 8 testes | Render, add to cart, feedback |
+| useOrderSummary   | 8 testes  | Cálculos, frete, edge cases          |
+| useAuth           | 7 testes  | Login, register, logout, loading     |
+| useCartItem       | 6 testes  | Optimistic UI, debounce, reverter    |
+| useCheckout       | 7 testes  | State machine, duplo clique, erros   |
+| StatusBadge       | 6 testes  | Todos os status, ícones, dot         |
+| OrderCard         | 9 testes  | Render, navegação, cancelamento      |
+| ProductCard       | 8 testes  | Render, add to cart, feedback        |
 
 ---
 
@@ -414,8 +427,8 @@ Armazenar em `useState` algo que pode ser calculado cria dois estados que precis
 Desenvolvedor Full-stack focado em NestJS, React/Next.js e TypeScript.
 Construindo sistemas completos com foco em boas práticas e arquitetura limpa.
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/seu-perfil)
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/seu-usuario)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/daniel-fernandes1988/)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/bdancost)
 
 ---
 
